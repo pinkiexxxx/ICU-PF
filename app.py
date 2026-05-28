@@ -9,7 +9,7 @@ import os
 
 matplotlib.use('Agg')
 
-st.set_page_config(page_title="脓毒症风险预测", page_icon="⚕️", layout="wide")
+st.set_page_config(page_title="Sepsis Risk Prediction", page_icon="⚕️", layout="wide")
 
 st.markdown("""
 <style>
@@ -86,43 +86,43 @@ def generate_random_bg(n=100):
 def main():
     with st.sidebar:
         st.image("https://cdn-icons-png.flaticon.com/512/3063/3063176.png", width=60)
-        st.markdown("### 患者数据")
+        st.markdown("### Patient Data")
         with st.form("input_form"):
-            st.markdown("#### 👤 基本信息")
-            Gender = st.selectbox("性别", ["男", "女"])
-            Gender_val = 1 if Gender == "男" else 0
+            st.markdown("#### 👤 Basic information")
+            Gender = st.selectbox("Gender", ["Male", "Female"])
+            Gender_val = 1 if Gender == "Male" else 0
 
-            st.markdown("#### ❤️ 合并症")
+            st.markdown("#### ❤️ Comorbidities")
             c1, c2 = st.columns(2)
             with c1:
-                Dementia = st.selectbox("痴呆", ["否", "是"])
-                Dementia_val = 1 if Dementia == "是" else 0
+                Dementia = st.selectbox("Dementia", ["no", "yes"])
+                Dementia_val = 1 if Dementia == "yes" else 0
             with c2:
-                Pneumonia = st.selectbox("肺炎", ["否", "是"])
-                Pneumonia_val = 1 if Pneumonia == "是" else 0
+                Pneumonia = st.selectbox("Pneumonia", ["no", "yes"])
+                Pneumonia_val = 1 if Pneumonia == "yes" else 0
 
-            st.markdown("#### 💊 用药情况")
+            st.markdown("#### 💊 Medication")
             c3, c4 = st.columns(2)
             with c3:
-                Antibiotics = st.selectbox("抗生素", ["否", "是"])
-                Antibiotics_val = 1 if Antibiotics == "是" else 0
+                Antibiotics = st.selectbox("Antibiotics", ["no", "yes"])
+                Antibiotics_val = 1 if Antibiotics == "yes" else 0
             with c4:
-                Nephtox = st.selectbox("肾毒性药物", ["否", "是"])
-                Nephtox_val = 1 if Nephtox == "是" else 0
-            Glucocorticoid = st.selectbox("糖皮质激素", ["否", "是"])
-            Glucocorticoid_val = 1 if Glucocorticoid == "是" else 0
+                Nephtox = st.selectbox("Nephrotoxic drugs", ["no", "yes"])
+                Nephtox_val = 1 if Nephtox == "yes" else 0
+            Glucocorticoid = st.selectbox("Glucocorticoids", ["no", "yes"])
+            Glucocorticoid_val = 1 if Glucocorticoid == "yes" else 0
 
-            st.markdown("#### 🧪 实验室检查")
-            Sofa = st.number_input("SOFA 评分", 0, 50, 5)
+            st.markdown("#### 🧪 laboratory examination")
+            Sofa = st.number_input("SOFA score", 0, 50, 5)
             RDW = st.number_input("RDW (%)", 0.0, 50.0, 14.5, step=0.1)
-            Calcium_total = st.number_input("血清总钙 (mEq/L)", 0.0, 50.0, 8.5, step=0.1)
+            Calcium_total = st.number_input("Total serum calcium (meq/l)", 0.0, 50.0, 8.5, step=0.1)
 
-            predict_btn = st.form_submit_button("开始分析", type="primary", use_container_width=True)
+            predict_btn = st.form_submit_button("Start analysis", type="primary", use_container_width=True)
 
     st.markdown("""
     <div class="main-header">
-        <h1>重症监护室的肺纤维化患者脓毒症风险预测</h1>
-        <p style="opacity:0.9">基于人工神经网络的临床决策辅助工具</p>
+        <h1>Risk prediction of sepsis in patients with pulmonary fibrosis in intensive care unit</h1>
+        <p style="opacity:0.9">Clinical decision aid tool based on artificial neural network</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -139,7 +139,7 @@ def main():
             bg_data = generate_random_bg()
 
         # 2. 计算 SHAP 并使用 f(x) 作为卡片概率
-        with st.spinner("正在计算..."):
+        with st.spinner("Calculating..."):
             explainer = shap.KernelExplainer(classifier1.predict_proba, bg_data)
             shap_vals_full = explainer.shap_values(df_input)
 
@@ -171,16 +171,16 @@ def main():
         c1, c2, c3 = st.columns([1, 2, 1])
         with c2:
             if prob_final < 0.25:
-                color, status = "#5cb85c", "低风险"
+                color, status = "#5cb85c", "Low risk"
             elif prob_final < 0.50:
-                color, status = "#f0ad4e", "中风险"
+                color, status = "#f0ad4e", "Medium risk"
             elif prob_final <= 0.6211:
-                color, status = "#d9534f", "中高风险"
+                color, status = "#d9534f", "Medium and high risk"
             else:
-                color, status = "#8b0000", "高风险"
+                color, status = "#8b0000", "High risk"
             st.markdown(f"""
             <div class="result-box" style="border-left:10px solid {color};">
-                <div style="color:#666;">预测脓毒症风险</div>
+                <div style="color:#666;">Predicting sepsis risk</div>
                 <div class="result-value">{prob_percent:.2f}%</div>
                 <div class="result-label" style="background:{color};">{status}</div>
             </div>
@@ -191,7 +191,7 @@ def main():
                                        data=df_input.iloc[0,:].values, feature_names=FEATURE_NAMES)
 
         with st.container():
-            st.markdown('<div class="chart-title">力图</div>', unsafe_allow_html=True)
+            st.markdown('<div class="chart-title">Force plot</div>', unsafe_allow_html=True)
             plt.figure(figsize=(24,5))
             shap.force_plot(final_base, final_values, df_input.iloc[0,:],
                             matplotlib=True, show=False, text_rotation=0)
@@ -207,14 +207,14 @@ def main():
             plt.clf()
 
         with st.container():
-            st.markdown('<div class="chart-title">瀑布图</div>', unsafe_allow_html=True)
+            st.markdown('<div class="chart-title">Waterfall plot</div>', unsafe_allow_html=True)
             fig2, ax2 = plt.subplots(figsize=(10,8))
             shap.plots.waterfall(explanation, max_display=12, show=False)
             st.pyplot(fig2, bbox_inches='tight')
             plt.clf()
 
     else:
-        st.markdown("<br><br><h3 style='text-align:center;color:#999;'>⬅️ 请输入数据开始分析</h3>",
+        st.markdown("<br><br><h3 style='text-align:center;color:#999;'>⬅️ Please input data to start analysis</h3>",
                     unsafe_allow_html=True)
 
 if __name__ == '__main__':
